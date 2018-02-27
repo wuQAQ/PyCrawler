@@ -1,4 +1,5 @@
 # -*- coding:utf8 -*-
+## 获取基金的基本信息
 import requests
 from bs4 import BeautifulSoup
 import time

@@ -1,4 +1,5 @@
 # -*- coding:utf8 -*-
+## 获取基金列表
 import requests
 import urllib.request 
 from bs4 import BeautifulSoup
