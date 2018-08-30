@@ -3,6 +3,8 @@ import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import urllib.request
+from Browser.Downloader import Downloader
+from Browser.MongoCURD import Connect
 
 
 class Unsplash(object):
@@ -12,13 +14,13 @@ class Unsplash(object):
         self.tags = "sky"
         self.url = 'https://unsplash.com/search/photos/'
         self.save_path = "./unsplash/"
-        self.driver = webdriver.Chrome('D:/chromedriver/chromedriver.exe')
+        self.driver = webdriver.Chrome('./driver/chromedriver.exe')
+        self.db_client = Connect.__init__(batch_size=10)
+        self.db_client.get_connection()
 
-    # 实现下拉动作，并返回网页源代码，times:下拉次数
     def do_scroll(self):
         # 打开目标网址
         driver = self.driver
-        # driver.execute_script("window.scrollTo(0, document.body.scrollHeight*8/11);")
         target = driver.find_element_by_id("spinner")
         driver.execute_script("arguments[0].scrollIntoView();", target)
 
@@ -32,8 +34,10 @@ class Unsplash(object):
         img_name = str(int(round(t * 1000))) + ".jpg"
         print("保存的文件名字：" + img_name)
         try:
-            urllib.request.urlretrieve(src, filename=self.save_path + img_name)
-        except urllib.ContentTooShortError:
+            # urllib.request.urlretrieve(src, filename=self.save_path + img_name)
+            downloader = Downloader(src_url=src, num_thread=5, file_name=self.save_path + img_name)
+            downloader.run()
+        except urllib.request.ContentTooShortError:
             print('Network conditions is not good.Reloading.')
             self.auto_down(src, img_name)
 
@@ -62,6 +66,7 @@ class Unsplash(object):
         for url in images:
             if "photo" in url:
                 self.save_img(url)
+                self
 
     def main(self):
         # 获取源码
