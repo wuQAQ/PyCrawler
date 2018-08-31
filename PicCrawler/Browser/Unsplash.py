@@ -15,7 +15,7 @@ class Unsplash(object):
         self.url = 'https://unsplash.com/search/photos/'
         self.save_path = "./unsplash/"
         self.driver = webdriver.Chrome('./driver/chromedriver.exe')
-        self.db_client = Connect.__init__(batch_size=10)
+        self.db_client = Connect(batch_size=10)
         self.db_client.get_connection()
 
     def do_scroll(self):
@@ -37,6 +37,7 @@ class Unsplash(object):
             # urllib.request.urlretrieve(src, filename=self.save_path + img_name)
             downloader = Downloader(src_url=src, num_thread=5, file_name=self.save_path + img_name)
             downloader.run()
+            return self.save_path + img_name
         except urllib.request.ContentTooShortError:
             print('Network conditions is not good.Reloading.')
             self.auto_down(src, img_name)
@@ -65,13 +66,13 @@ class Unsplash(object):
         # 获取图片下载地址，
         for url in images:
             if "photo" in url:
-                self.save_img(url)
-                self
+                filename = self.save_img(url)
+                self.db_client.collect_record(url, filename)
 
     def main(self):
         # 获取源码
         self.driver.get(self.url + self.tags)
-        times = 20
+        times = 1
         for i in range(times):
             print('正在下拉' + str(i + 1) + '次：')
             html = self.do_scroll()
