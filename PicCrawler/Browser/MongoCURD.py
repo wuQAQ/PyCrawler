@@ -34,6 +34,3 @@ class Connect(object):
             fs = GridFS(db, collection="images")
             print(self.batch_files[i])
             fs.put(open(self.batch_files[i], 'rb'))
-
-
-
